@@ -22,29 +22,29 @@ function noop(): void {
   // do nothing
 }
 
-export interface Customer {
+export interface Class {
   id: string;
-  avatar: string;
-  name: string;
-  email: string;
-  address: { city: string; state: string; country: string; street: string };
-  phone: string;
-  createdAt: Date;
+  course_name: string;
+  studentEnrolledCount: Number;
+  avg_rating: Number;
+  join_code: Number;
+  quizCreated: Number;
+  // createdAt: Date;
 }
 
-interface CustomersTableProps {
+interface ClassesTableProps {
   count?: number;
   page?: number;
-  rows?: Customer[];
+  rows?: Class[];
   rowsPerPage?: number;
 }
 
-export function CustomersTable({
+export function ClassesTable({
   count = 0,
   rows = [],
   page = 0,
   rowsPerPage = 0,
-}: CustomersTableProps): React.JSX.Element {
+}: ClassesTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
     return rows.map((customer) => customer.id);
   }, [rows]);
@@ -73,11 +73,11 @@ export function CustomersTable({
                   }}
                 />
               </TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Signed Up</TableCell>
+              <TableCell>Course Name</TableCell>
+              <TableCell>Enrolled Students</TableCell>
+              <TableCell>Reviews</TableCell>
+              <TableCell>Class Join Code</TableCell>
+              <TableCell>No of Quizzes</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -95,21 +95,19 @@ export function CustomersTable({
                         } else {
                           deselectOne(row.id);
                         }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-                      <Avatar src={row.avatar} />
-                      <Typography variant="subtitle2">{row.name}</Typography>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>
-                    {row.address.city}, {row.address.state}, {row.address.country}
-                  </TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
+                        }}
+                      />
+                      </TableCell>
+                      <TableCell>
+                      {row.course_name.toString()}
+                      </TableCell>
+                      <TableCell>{row.studentEnrolledCount.toString()}</TableCell>
+                      <TableCell>
+                      {row.avg_rating.toString()}
+                      </TableCell>
+                      <TableCell>{row.join_code.toString()}</TableCell>
+                      <TableCell>{row.quizCreated.toString()}</TableCell>
+                      {/* <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell> */}
                 </TableRow>
               );
             })}
