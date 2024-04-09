@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -17,6 +15,12 @@ import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 
 import { useSelection } from '@/hooks/use-selection';
+import { Button } from '@mui/material';
+import { EditableClass } from '@/app/dashboard/course/page';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 function noop(): void {
   // do nothing
@@ -25,18 +29,22 @@ function noop(): void {
 export interface Class {
   id: string;
   course_name: string;
-  studentEnrolledCount: Number;
-  avg_rating: Number;
-  join_code: Number;
-  quizCreated: Number;
+  studentEnrolledCount: number;
+  avg_rating: number;
+  join_code: number;
+  quizCreated: number;
   // createdAt: Date;
 }
 
 interface ClassesTableProps {
   count?: number;
   page?: number;
-  rows?: Class[];
+  rows?: EditableClass[];
   rowsPerPage?: number;
+  addClass: (newClass: EditableClass) => void;
+  updateClass: (updatedClass: EditableClass) => void;
+  deleteClass: (classId: string) => void;
+  onEditClass: (classData: EditableClass) => void;
 }
 
 export function ClassesTable({
@@ -44,6 +52,7 @@ export function ClassesTable({
   rows = [],
   page = 0,
   rowsPerPage = 0,
+  addClass, updateClass, deleteClass, onEditClass,
 }: ClassesTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
     return rows.map((customer) => customer.id);
@@ -78,38 +87,48 @@ export function ClassesTable({
               <TableCell>Reviews</TableCell>
               <TableCell>Class Join Code</TableCell>
               <TableCell>No of Quizzes</TableCell>
+              <TableCell><p> Actions </p></TableCell>
+
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => {
               const isSelected = selected?.has(row.id);
 
-              return (
+                return (
                 <TableRow hover key={row.id} selected={isSelected}>
                   <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          selectOne(row.id);
-                        } else {
-                          deselectOne(row.id);
-                        }
-                        }}
-                      />
-                      </TableCell>
-                      <TableCell>
-                      {row.course_name.toString()}
-                      </TableCell>
-                      <TableCell>{row.studentEnrolledCount.toString()}</TableCell>
-                      <TableCell>
-                      {row.avg_rating.toString()}
-                      </TableCell>
-                      <TableCell>{row.join_code.toString()}</TableCell>
-                      <TableCell>{row.quizCreated.toString()}</TableCell>
-                      {/* <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell> */}
+                  <Checkbox
+                    checked={isSelected}
+                    onChange={(event) => {
+                    if (event.target.checked) {
+                      selectOne(row.id);
+                    } else {
+                      deselectOne(row.id);
+                    }
+                    }}
+                  />
+                  </TableCell>
+                  <TableCell>
+                  {row.course_name.toString()}
+                  </TableCell>
+                  <TableCell>{row.studentEnrolledCount.toString()}</TableCell>
+                  <TableCell>
+                  {row.avg_rating.toString()}
+                  </TableCell>
+                  <TableCell>{row.join_code.toString()}</TableCell>
+                  <TableCell>{row.quizCreated.toString()}</TableCell>
+                  {/* <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell> */}
+                  <TableCell>
+                  <IconButton onClick={() => onEditClass(row)} aria-label="edit" style={{ marginRight: '10px'}}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton onClick={() => deleteClass(row.id)} aria-label="delete">
+                    <DeleteIcon />
+                  </IconButton>
+                  </TableCell>
                 </TableRow>
-              );
+                );
             })}
           </TableBody>
         </Table>
