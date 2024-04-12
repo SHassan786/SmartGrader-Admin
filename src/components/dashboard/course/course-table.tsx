@@ -27,10 +27,10 @@ function noop(): void {
 }
 
 export interface Class {
-  id: string;
+  _id: string;
   course_name: string;
   studentEnrolledCount: number;
-  avg_rating: number;
+  avg_rating : { $numberDecimal: string };
   join_code: number;
   quizCreated: number;
   // createdAt: Date;
@@ -55,7 +55,7 @@ export function ClassesTable({
   addClass, updateClass, deleteClass, onEditClass,
 }: ClassesTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
-    return rows.map((customer) => customer.id);
+    return rows.map((customer) => customer._id);
   }, [rows]);
 
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
@@ -84,7 +84,7 @@ export function ClassesTable({
               </TableCell>
               <TableCell>Course Name</TableCell>
               <TableCell>Enrolled Students</TableCell>
-              <TableCell>Reviews</TableCell>
+              <TableCell>Avg rating</TableCell>
               <TableCell>Class Join Code</TableCell>
               <TableCell>No of Quizzes</TableCell>
               <TableCell><p> Actions </p></TableCell>
@@ -93,18 +93,18 @@ export function ClassesTable({
           </TableHead>
           <TableBody>
             {rows.map((row) => {
-              const isSelected = selected?.has(row.id);
+              const isSelected = selected?.has(row._id);
 
                 return (
-                <TableRow hover key={row.id} selected={isSelected}>
+                <TableRow hover key={row._id} selected={isSelected}>
                   <TableCell padding="checkbox">
                   <Checkbox
                     checked={isSelected}
                     onChange={(event) => {
                     if (event.target.checked) {
-                      selectOne(row.id);
+                      selectOne(row._id);
                     } else {
-                      deselectOne(row.id);
+                      deselectOne(row._id);
                     }
                     }}
                   />
@@ -114,7 +114,7 @@ export function ClassesTable({
                   </TableCell>
                   <TableCell>{row.studentEnrolledCount.toString()}</TableCell>
                   <TableCell>
-                  {row.avg_rating.toString()}
+                  {row.avg_rating.$numberDecimal.toString()}
                   </TableCell>
                   <TableCell>{row.join_code.toString()}</TableCell>
                   <TableCell>{row.quizCreated.toString()}</TableCell>
@@ -123,7 +123,7 @@ export function ClassesTable({
                   <IconButton onClick={() => onEditClass(row)} aria-label="edit" style={{ marginRight: '10px'}}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton onClick={() => deleteClass(row.id)} aria-label="delete">
+                  <IconButton onClick={() => deleteClass(row._id)} aria-label="delete">
                     <DeleteIcon />
                   </IconButton>
                   </TableCell>
