@@ -1,6 +1,8 @@
 'use client';
 
 import type { User } from '@/types/user';
+import axios from 'axios';
+import { API_URLS } from '@/api';
 
 function generateToken(): string {
   const arr = new Uint8Array(12);
@@ -11,9 +13,9 @@ function generateToken(): string {
 const user = {
   id: 'USR-000',
   avatar: '/assets/avatar.png',
-  firstName: 'Sofia',
-  lastName: 'Rivers',
-  email: 'sofia@devias.io',
+  firstName: 'ahsan',
+  lastName: 'ali',
+  email: 'ahsanali@yahoo.com',
 } satisfies User;
 
 export interface SignUpParams {
@@ -53,16 +55,30 @@ class AuthClient {
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
     const { email, password } = params;
+    console.log(email, password);
 
     // Make API request
+    const response = await axios.post(API_URLS.signIn, { email, password });
 
-    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'sofia@devias.io' || password !== 'Secret1') {
+    if (response.status !== 200) {
       return { error: 'Invalid credentials' };
+    } 
+
+    if (response.data.role !== 'teacher') {
+      return { error: 'You are not a teacher' };
     }
 
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
+    localStorage.setItem('custom-auth-token', response.data.token);
+
+    console.log(response.data);
+
+    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
+    // if (email !== 'sofia@devias.io' || password !== 'Secret1') {
+    //   return { error: 'Invalid credentials' };
+    // }
+
+    // const token = generateToken();
+    // localStorage.setItem('custom-auth-token', token);
 
     return {};
   }
