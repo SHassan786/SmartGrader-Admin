@@ -6,6 +6,7 @@ export const paths = {
     account: '/dashboard/account',
     course: '/dashboard/course',
     question: '/dashboard/question',
+    quiz: '/dashboard/quiz',
     settings: '/dashboard/settings',
   },
   errors: { notFound: '/errors/not-found' },
