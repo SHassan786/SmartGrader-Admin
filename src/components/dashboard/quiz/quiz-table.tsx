@@ -28,9 +28,14 @@ function noop(): void {
 
 export interface Quiz {
   id: string;
-  question: String;
-  answer: String;
-  label: String;
+  title: String;
+  questions: String[];
+  start_time: Date;
+  end_time: Date;
+  is_active: boolean;
+  is_relesead: boolean;
+  class_id: String;
+
 }
 
 interface QuizTableProps {
@@ -79,9 +84,11 @@ export function QuizTable({
                   }}
                 />
               </TableCell>
-              <TableCell>Question</TableCell>
-              <TableCell>Answer</TableCell>
-              <TableCell>Label</TableCell>
+              <TableCell>Title</TableCell>
+              <TableCell>Start Time</TableCell>
+              <TableCell>End Time</TableCell>
+              <TableCell>Active Status</TableCell>
+              <TableCell>Released Status</TableCell>
               <TableCell><p> Actions </p></TableCell>
 
             </TableRow>
@@ -105,13 +112,19 @@ export function QuizTable({
                   />
                   </TableCell>
                   <TableCell>
-                  {row.question.toString()}
+                  {row.title.toString()}
                   </TableCell>
                   <TableCell>
-                  {row.answer.toString()}
+                  {row.start_time.toString()}
                   </TableCell>
                   <TableCell>
-                  {row.label.toString()}
+                  {row.end_time.toString()}
+                  </TableCell>
+                  <TableCell>
+                  {row.is_active.toString()}
+                  </TableCell>
+                  <TableCell>
+                  {row.is_relesead.toString()}
                   </TableCell>
                   <TableCell>
                   <IconButton onClick={() => onEditQuiz(row)} aria-label="edit" style={{ marginRight: '10px'}}>

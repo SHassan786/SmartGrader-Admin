@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, FormControlLabel, Checkbox, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
 export interface QuizFormData {
-  id?: string;
-  question: String;
-  answer: String;
-  label: String;
+  id: string;
+  title: String;
+  questions: String[];
+  start_time: Date;
+  end_time: Date;
+  is_active: boolean;
+  is_relesead: boolean;
+  class_id: String;
 }
 
 interface QuestionFormDialogProps {
@@ -17,9 +21,14 @@ interface QuestionFormDialogProps {
 
 export const QuizFormDialog: React.FC<QuestionFormDialogProps> = ({ open, quizData, onClose, onSubmit }) => {
   const [formData, setFormData] = useState<QuizFormData>({
-    question: '',
-    answer: '',
-    label: '',
+    id: '',
+    title: 'Sample Quiz',
+    questions: ['Question 1', 'Question 2'],
+    start_time: new Date(),
+    end_time: new Date(),
+    is_active: false,
+    is_relesead: false,
+    class_id: 'Sample Class ID',
   });
 
   useEffect(() => {
@@ -59,41 +68,82 @@ export const QuizFormDialog: React.FC<QuestionFormDialogProps> = ({ open, quizDa
         <TextField
           autoFocus
           margin="dense"
-          name="question"
-          label="Question"
+          name="title"
+          label="Title"
           type="text"
           fullWidth
           variant="outlined"
-          value={formData.question}
+          value={formData.title}
           onChange={handleChange}
           style={{ padding: '5px' }}
         />
         {/* Repeat TextField components for each field you have in the form */}
-        {/* Example for studentEnrolledCount */}
         <TextField
           autoFocus
           margin="dense"
-          name="answer"
-          label="Answer"
-          type="text"
+          name="start_time"
+          label="Start Time"
+          type="datetime-local"
           fullWidth
           variant="outlined"
-          value={formData.answer}
+          value={formData.start_time.toISOString().substring(0, 16)}
           onChange={handleChange}
           style={{ padding: '5px' }} 
         />
         <TextField
           autoFocus
           margin="dense"
-          name="label"
-          label="Label"
-          type="text"
+          name="end_time"
+          label="End Time"
+          type="datetime-local"
           fullWidth
           variant="outlined"
-          value={formData.label}
+          value={formData.start_time.toISOString().substring(0, 16)}
           onChange={handleChange}
-          style={{ padding: '5px' }}  
+          style={{ padding: '5px' }} 
         />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={formData.is_active}
+              onChange={handleChange}
+              name="is_active"
+              color="primary"
+            />
+          }
+          label="Is Active"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={formData.is_relesead}
+              onChange={handleChange}
+              name="is_relesead"
+              color="primary"
+            />
+          }
+          label="Is Released"
+        />
+        <FormControl
+          margin="dense"
+          fullWidth
+          variant="outlined"
+          style={{ padding: '5px' }}
+        >
+          <InputLabel>Questions</InputLabel>
+          <Select
+            multiple
+            value={formData.questions}
+            onChange={(event) => {
+              const { value } = event.target;
+              setFormData(prev => ({ ...prev, questions: value as string[] }));
+            }}
+          >
+            {/* Replace 'Question 1', 'Question 2' with your actual options */}
+            <MenuItem value="Question 1">Question 1</MenuItem>
+            <MenuItem value="Question 2">Question 2</MenuItem>
+          </Select>
+        </FormControl>
       </DialogContent>
       <DialogActions style={{paddingRight: '25px'}}>
         <Button onClick={handleCancel} style={{backgroundColor: 'red', color: 'white'}}>Cancel</Button>
