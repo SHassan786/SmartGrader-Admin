@@ -7,13 +7,13 @@ import { EditableClass } from '@/app/dashboard/course/page';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Button } from '@mui/material';
 
-interface CustomersFiltersProps {
+interface CourseFiltersProps {
   onAddClass: () => void;
 }
 
-export function CustomersFilters({
+export function CourseFilters({
   onAddClass
-}: CustomersFiltersProps): React.JSX.Element {
+}: CourseFiltersProps): React.JSX.Element {
   return (
     <Card sx={{ p: 3, display: 'flex', justifyContent: 'space-between' }}>
       <OutlinedInput

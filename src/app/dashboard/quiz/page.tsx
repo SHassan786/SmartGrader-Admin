@@ -27,9 +27,13 @@ export interface EditableQuiz extends Quiz {
 const initialClasses: EditableQuiz[] = [
   {
     id: '626d5ad8f2a5f3e8c1a7c123',
-    question: "What is data mining?",
-    answer: "this is my answerthis is my answerthis is my answerthis is my answerthis is my answerthis is mythis is my answerthis is my answerthis is my answerthis is my answerthis is my answerthis is m ",
-    label: "Mining",
+    title: "Science Quiz 1",
+    questions: ["What is the capital of France?", "What is the capital of Germany?"],
+    class_id: "626d5ad8f2a5f3e8c1a7c123",
+    is_active: true,
+    is_relesead: true,
+    start_time: dayjs().subtract(1, 'day').toDate(),
+    end_time: dayjs().add(1, 'day').toDate(),
   },
   // Add more initial data as needed
 ];
@@ -81,13 +85,16 @@ export default function Page(): React.JSX.Element {
     // ... rest of your logic
   };
 
-  const handleEdit = (questionToEdit: EditableQuiz) => {
+  const handleEdit = (quizToEdit: EditableQuiz) => {
     setEditingQuiz({
-      id: questionToEdit.id,
-      question: questionToEdit.question,
-      answer: questionToEdit.answer,
-      label: questionToEdit.label,
-
+      id: quizToEdit.id,
+      title: quizToEdit.title,
+      start_time: quizToEdit.start_time,
+      end_time: quizToEdit.end_time,
+      is_active: quizToEdit.is_active,
+      is_relesead: quizToEdit.is_relesead,
+      questions: quizToEdit.questions,
+      class_id: quizToEdit.class_id,
     });
     setIsDialogOpen(true); // Open the dialog for editing
   };

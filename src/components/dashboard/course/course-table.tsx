@@ -28,12 +28,12 @@ function noop(): void {
 
 export interface Class {
   _id: string;
+  description: string;
   course_name: string;
   studentEnrolledCount: number;
-  avg_rating : { $numberDecimal: string };
   join_code: number;
   quizCreated: number;
-  // createdAt: Date;
+
 }
 
 interface ClassesTableProps {
@@ -41,8 +41,6 @@ interface ClassesTableProps {
   page?: number;
   rows?: EditableClass[];
   rowsPerPage?: number;
-  addClass: (newClass: EditableClass) => void;
-  updateClass: (updatedClass: EditableClass) => void;
   deleteClass: (classId: string) => void;
   onEditClass: (classData: EditableClass) => void;
 }
@@ -52,7 +50,8 @@ export function ClassesTable({
   rows = [],
   page = 0,
   rowsPerPage = 0,
-  addClass, updateClass, deleteClass, onEditClass,
+  deleteClass,
+  onEditClass,
 }: ClassesTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
     return rows.map((customer) => customer._id);
@@ -83,8 +82,8 @@ export function ClassesTable({
                 />
               </TableCell>
               <TableCell>Course Name</TableCell>
+              <TableCell>Description</TableCell>
               <TableCell>Enrolled Students</TableCell>
-              <TableCell>Avg rating</TableCell>
               <TableCell>Class Join Code</TableCell>
               <TableCell>No of Quizzes</TableCell>
               <TableCell><p> Actions </p></TableCell>
@@ -112,10 +111,10 @@ export function ClassesTable({
                   <TableCell>
                   {row.course_name.toString()}
                   </TableCell>
-                  <TableCell>{row.studentEnrolledCount.toString()}</TableCell>
                   <TableCell>
-                  {row.avg_rating.$numberDecimal.toString()}
+                  {row.description.toString()}
                   </TableCell>
+                  <TableCell>{row.studentEnrolledCount.toString()}</TableCell>
                   <TableCell>{row.join_code.toString()}</TableCell>
                   <TableCell>{row.quizCreated.toString()}</TableCell>
                   {/* <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell> */}

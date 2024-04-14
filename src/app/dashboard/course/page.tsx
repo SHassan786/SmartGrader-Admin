@@ -11,7 +11,7 @@ import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import dayjs from 'dayjs';
 
 import { config } from '@/config';
-import { CustomersFilters } from '@/components/dashboard/course/course-filters';
+import { CourseFilters } from '@/components/dashboard/course/course-filters';
 import { ClassesTable } from '@/components/dashboard/course/course-table';
 import type { Class } from '@/components/dashboard/course/course-table';
 import { useState, useEffect } from 'react';
@@ -28,17 +28,6 @@ export interface EditableClass extends Class {
 }
 
 const initialClasses: EditableClass[] = [
-  // {
-  //   _id: '626d5ad8f2a5f3e8c1a7c123',
-  //   course_name: "Introduction to Computer Science",
-  //   avg_rating: {
-  //     $numberDecimal: "4.5"
-  //   },
-  //   join_code: 123456,
-  //   quizCreated: 2,
-  //   studentEnrolledCount: 2,
-  // },
-  // Add more initial data as needed
 ];
 
 export default function Page(): React.JSX.Element {
@@ -46,37 +35,46 @@ export default function Page(): React.JSX.Element {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClass, setEditingClass] = useState<ClassFormData | undefined>(undefined);
 
-  useEffect(() => {
-    // Fetch data from the API
-    const fetchData = async () => {
-      try {
-        // add token to the header as Bearer token
-        const token = localStorage.getItem('custom-auth-token');
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
-        const response = await axios.get(API_URLS.classes, { headers });
-        setClasses(response.data);
-      } catch (error) {
-        console.error('Error fetching classes:', error);
-      }
+  const fetchData = async () => {
+    try {
+      // add token to the header as Bearer token
+      const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await axios.get(API_URLS.classes, { headers });
+      setClasses(response.data);
+      console.log(response.data);
+      console.log("Classes", classes);
+      console.log("class count", classes.length);
+    } catch (error) {
+      console.error('Error fetching classes:', error);
     }
+  }
+
+  useEffect(() => {
 
     fetchData();
 
   }, []);
-  
-  // Implement CRUD operations here
-  const addClass = (newClass: EditableClass) => {
-    setClasses([...classes, newClass]);
-  };
 
   const updateClass = (updatedClass: EditableClass) => {
-    // setClasses(classes.map(c => c.id === updatedClass.id ? updatedClass : c));
+    setClasses(classes.map(c => c._id === updatedClass._id ? updatedClass : c));
   };
 
-  const deleteClass = (classId: string) => {
-    // setClasses(classes.filter(c => c.id !== classId));
+  // call delete Api
+  const deleteClass = async (classId: string) => {
+    try{
+      const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await axios.delete(`${API_URLS.deleteClass}/${classId}`, { headers });
+      console.log("Response", response);
+      setClasses(classes.filter(c => c._id !== classId));
+    } catch {
+
+    }
   };
 
   const handleOpenDialog = () => {
@@ -87,42 +85,61 @@ export default function Page(): React.JSX.Element {
     setIsDialogOpen(false);
     setEditingClass(undefined); // Reset editing class
   };
-
-  function generateNewId() {
-    // This example generates a random UUID, but you should use a method that
-    // makes sense for your application and guarantees uniqueness as needed.
-    return 'xxxx-xxxx-4xxx-yxxx-xxxx-xxxx'.replace(/[xy]/g, function(c) {
-      var r = (Math.random() * 16) | 0, v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  }
   
-  const handleAddOrUpdateClass = (formData: ClassFormData) => {
-    // if (editingClass && editingClass._id) {
-    //   updateClass({ ...formData, _id: editingClass._id });
-    // } else {
-    //   const newId = generateNewId(); // Generate a new ID for the new class
-    //   addClass({ ...formData, _id: newId });
-    // }
-    // ... rest of your logic
+  const handleAddOrUpdateClass = async (formData: ClassFormData) => {
+    try {
+      // add token to the header as Bearer token
+      const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (editingClass && editingClass._id) {  
+        const body = {
+          name: formData.course_name,
+          description: formData.description,
+        }
+        console.log("body", body);
+        const response = await axios.put(`${API_URLS.updateClass}/${editingClass._id}`, body, { headers });
+        updateClass({ ...formData, _id: editingClass._id });
+         
+      } else {
+        console.log("formdata", formData);
+        const body = {
+          name: formData.course_name,
+          description: formData.description,
+        }
+        const response = await axios.post(API_URLS.addClass, body, { headers });
+        console.log('add class response', response);
+        fetchData();
+        console.log("data fetched");
+        setEditingClass(undefined); 
+        
+      }
+
+      
+    } catch (error) {
+
+      console.error('Error fetching classes:', error);
+    }
   };
 
   const handleEdit = (classToEdit: EditableClass) => {
-    // setEditingClass({
-    //   id: classToEdit.id,
-    //   course_name: classToEdit.course_name,
-    //   studentEnrolledCount: classToEdit.studentEnrolledCount,
-    //   avg_rating: classToEdit.avg_rating,
-    //   join_code: classToEdit.join_code,
-    //   quizCreated: classToEdit.quizCreated,
-    // });
+    setEditingClass({
+      _id: classToEdit._id,
+      course_name: classToEdit.course_name,
+      description: classToEdit.description,
+      studentEnrolledCount: classToEdit.studentEnrolledCount,
+      join_code: classToEdit.join_code,
+      quizCreated: classToEdit.quizCreated,
+    });
     setIsDialogOpen(true); // Open the dialog for editing
   };
   
   
 
   const page = 0;
-  const rowsPerPage = 5;
+  const rowsPerPage = 25;
 
   const paginatedClasses = applyPagination(classes, page, rowsPerPage);
 
@@ -146,12 +163,10 @@ export default function Page(): React.JSX.Element {
           </Button>
         </div> */}
       </Stack>
-      <CustomersFilters
+      <CourseFilters
       onAddClass={handleOpenDialog}
        />
       <ClassesTable
-        addClass={addClass}
-        updateClass={updateClass}
         deleteClass={deleteClass}
         count={paginatedClasses.length}
         page={page}
@@ -169,6 +184,7 @@ export default function Page(): React.JSX.Element {
   );
 }
 
+// this is not working
 function applyPagination(rows: Class[], page: number, rowsPerPage: number): Class[] {
   return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 }
