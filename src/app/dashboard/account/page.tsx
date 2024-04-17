@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
@@ -8,9 +10,17 @@ import { config } from '@/config';
 import { AccountDetailsForm } from '@/components/dashboard/account/account-details-form';
 import { AccountInfo } from '@/components/dashboard/account/account-info';
 
-export const metadata = { title: `Account | Dashboard | ${config.site.name}` } satisfies Metadata;
+// export const metadata = { title: `Account | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
+  const [user, setUser] = React.useState({
+    name: localStorage.getItem('user-name') || '',
+    email: localStorage.getItem('user-email') || '',
+  });
+
+  const handleUpdateUser = (updatedUser: { name: string; email: string }) => {
+    setUser(updatedUser);
+  };
   return (
     <Stack spacing={3}>
       <div>
@@ -18,10 +28,10 @@ export default function Page(): React.JSX.Element {
       </div>
       <Grid container spacing={3}>
         <Grid lg={4} md={6} xs={12}>
-          <AccountInfo />
+          <AccountInfo user={user} />
         </Grid>
         <Grid lg={8} md={6} xs={12}>
-          <AccountDetailsForm />
+          <AccountDetailsForm onUpdateUser={handleUpdateUser} />
         </Grid>
       </Grid>
     </Stack>

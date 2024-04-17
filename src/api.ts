@@ -3,7 +3,7 @@ const host = 'http://localhost:5000';
 export const API_URLS = {
     signUp: `${host}/signUp`,
     signIn: `${host}/signIn`,
-    signOut: `${host}/signOut`,
+    updateProfile: `${host}/teacher/profile`,
     classes: `${host}/class`,
     addClass: `${host}/class`,
     deleteClass: `${host}/class`,
