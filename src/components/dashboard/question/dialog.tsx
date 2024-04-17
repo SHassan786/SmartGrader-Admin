@@ -6,6 +6,7 @@ export interface QuestionFormData {
   question: String;
   answer: String;
   label: String;
+  true_grade: Number;
 }
 
 interface QuestionFormDialogProps {
@@ -20,6 +21,7 @@ export const QuestionFormDialog: React.FC<QuestionFormDialogProps> = ({ open, qu
     question: '',
     answer: '',
     label: '',
+    true_grade: 0,
   });
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export const QuestionFormDialog: React.FC<QuestionFormDialogProps> = ({ open, qu
           onChange={handleChange}
           style={{ padding: '5px' }} 
         />
-        <TextField
+        {/* <TextField
           autoFocus
           margin="dense"
           name="label"
@@ -93,11 +95,11 @@ export const QuestionFormDialog: React.FC<QuestionFormDialogProps> = ({ open, qu
           value={formData.label}
           onChange={handleChange}
           style={{ padding: '5px' }}  
-        />
+        /> */}
       </DialogContent>
       <DialogActions style={{paddingRight: '25px'}}>
         <Button onClick={handleCancel} style={{backgroundColor: 'red', color: 'white'}}>Cancel</Button>
-        <Button onClick={handleFormSubmit} style={{backgroundColor: 'green', color: 'white'}}>Create</Button>
+        <Button onClick={handleFormSubmit} style={{backgroundColor: 'green', color: 'white'}}>Submit</Button>
       </DialogActions>
     </Dialog>
   );

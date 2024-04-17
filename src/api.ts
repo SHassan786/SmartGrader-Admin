@@ -8,4 +8,9 @@ export const API_URLS = {
     addClass: `${host}/class`,
     deleteClass: `${host}/class`,
     updateClass: `${host}/class`,
+    getQuizzes: `${host}/quiz/getQuizzesForTeacher`,
+    updateQuiz: `${host}/quiz`,
+    getQuestionsByQuizId: `${host}/question/getQuestionsByQuizId`,
+    createQuestion: `${host}/question/createQuestionsByQuizId`,
+    updateQuestion: `${host}/question/updateQuestion`,
 } as const;

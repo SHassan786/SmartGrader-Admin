@@ -27,9 +27,9 @@ export function QuizFilters({
         }
         sx={{ maxWidth: '500px' }}
       />
-      <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={onAddQuestion}>
+      {/* <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={onAddQuestion}>
         Add
-      </Button>
+      </Button> */}
     </Card>
   );
 }

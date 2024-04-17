@@ -32,7 +32,6 @@ export const QuizFormDialog: React.FC<QuestionFormDialogProps> = ({ open, quizDa
   });
 
   useEffect(() => {
-    // If classData is provided (editing), populate the form with existing data
     if (quizData) {
       setFormData(quizData);
     }
@@ -42,7 +41,7 @@ export const QuizFormDialog: React.FC<QuestionFormDialogProps> = ({ open, quizDa
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     // If the input is for a number field, convert the value to a number.
-    const isNumeric = ['studentEnrolledCount', 'avg_rating', 'join_code', 'quizCreated'].includes(name);
+    const isNumeric = ['star_time', 'end_time'].includes(name);
     setFormData(prev => ({ ...prev, [name]: isNumeric ? Number(value) : value }));
   };
 
@@ -74,8 +73,8 @@ export const QuizFormDialog: React.FC<QuestionFormDialogProps> = ({ open, quizDa
           fullWidth
           variant="outlined"
           value={formData.title}
-          onChange={handleChange}
           style={{ padding: '5px' }}
+          onChange={handleChange}
         />
         {/* Repeat TextField components for each field you have in the form */}
         <TextField
@@ -86,9 +85,9 @@ export const QuizFormDialog: React.FC<QuestionFormDialogProps> = ({ open, quizDa
           type="datetime-local"
           fullWidth
           variant="outlined"
-          value={formData.start_time.toISOString().substring(0, 16)}
-          onChange={handleChange}
+          value={formData.start_time}
           style={{ padding: '5px' }} 
+          onChange={handleChange}
         />
         <TextField
           autoFocus
@@ -98,57 +97,38 @@ export const QuizFormDialog: React.FC<QuestionFormDialogProps> = ({ open, quizDa
           type="datetime-local"
           fullWidth
           variant="outlined"
-          value={formData.start_time.toISOString().substring(0, 16)}
-          onChange={handleChange}
+          value={formData.end_time}
           style={{ padding: '5px' }} 
+          onChange={handleChange}
         />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={formData.is_active}
-              onChange={handleChange}
-              name="is_active"
-              color="primary"
-            />
-          }
-          label="Is Active"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={formData.is_relesead}
-              onChange={handleChange}
-              name="is_relesead"
-              color="primary"
-            />
-          }
-          label="Is Released"
-        />
-        <FormControl
-          margin="dense"
-          fullWidth
-          variant="outlined"
-          style={{ padding: '5px' }}
-        >
-          <InputLabel>Questions</InputLabel>
-          <Select
-            multiple
-            value={formData.questions}
-            onChange={(event) => {
-              const { value } = event.target;
-              setFormData(prev => ({ ...prev, questions: value as string[] }));
-            }}
-          >
-            {/* Replace 'Question 1', 'Question 2' with your actual options */}
-            <MenuItem value="Question 1">Question 1</MenuItem>
-            <MenuItem value="Question 2">Question 2</MenuItem>
-          </Select>
-        </FormControl>
       </DialogContent>
       <DialogActions style={{paddingRight: '25px'}}>
         <Button onClick={handleCancel} style={{backgroundColor: 'red', color: 'white'}}>Cancel</Button>
-        <Button onClick={handleFormSubmit} style={{backgroundColor: 'green', color: 'white'}}>Create</Button>
+        <Button onClick={handleFormSubmit} style={{backgroundColor: 'green', color: 'white'}}>Submit</Button>
       </DialogActions>
     </Dialog>
   );
 };
+
+
+
+// <FormControl
+// margin="dense"
+// fullWidth
+// variant="outlined"
+// style={{ padding: '5px' }}
+// >
+// <InputLabel>Questions</InputLabel>
+// <Select
+//   multiple
+//   value={formData.questions}
+//   onChange={(event) => {
+//     const { value } = event.target;
+//     setFormData(prev => ({ ...prev, questions: value as string[] }));
+//   }}
+// >
+//   {/* Replace 'Question 1', 'Question 2' with your actual options */}
+//   <MenuItem value="Question 1">Question 1</MenuItem>
+//   <MenuItem value="Question 2">Question 2</MenuItem>
+// </Select>
+// </FormControl>
