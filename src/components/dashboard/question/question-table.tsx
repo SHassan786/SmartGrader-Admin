@@ -27,9 +27,10 @@ function noop(): void {
 }
 
 export interface Question {
-  id: string;
+  _id: string;
   question: String;
   answer: String;
+  true_grade: Number;
   label: String;
 }
 
@@ -38,8 +39,6 @@ interface QuestionTableProps {
   page?: number;
   rows?: EditableQuestion[];
   rowsPerPage?: number;
-  addQuestion: (newClass: EditableQuestion) => void;
-  updateQuestion: (updatedClass: EditableQuestion) => void;
   deleteQuestion: (classId: string) => void;
   onEditQuestion: (classData: EditableQuestion) => void;
 }
@@ -49,10 +48,10 @@ export function QuestionTable({
   rows = [],
   page = 0,
   rowsPerPage = 0,
-  addQuestion, updateQuestion, deleteQuestion, onEditQuestion,
+  deleteQuestion, onEditQuestion,
 }: QuestionTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
-    return rows.map((question) => question.id);
+    return rows.map((question) => question._id);
   }, [rows]);
 
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
@@ -88,18 +87,18 @@ export function QuestionTable({
           </TableHead>
           <TableBody>
             {rows.map((row) => {
-              const isSelected = selected?.has(row.id);
+              const isSelected = selected?.has(row._id);
 
                 return (
-                <TableRow hover key={row.id} selected={isSelected}>
+                <TableRow hover key={row._id} selected={isSelected}>
                   <TableCell padding="checkbox">
                   <Checkbox
                     checked={isSelected}
                     onChange={(event) => {
                     if (event.target.checked) {
-                      selectOne(row.id);
+                      selectOne(row._id);
                     } else {
-                      deselectOne(row.id);
+                      deselectOne(row._id);
                     }
                     }}
                   />
@@ -117,7 +116,7 @@ export function QuestionTable({
                   <IconButton onClick={() => onEditQuestion(row)} aria-label="edit" style={{ marginRight: '10px'}}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton onClick={() => deleteQuestion(row.id)} aria-label="delete">
+                  <IconButton onClick={() => deleteQuestion(row._id)} aria-label="delete">
                     <DeleteIcon />
                   </IconButton>
                   </TableCell>

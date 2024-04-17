@@ -14,8 +14,10 @@ import { config } from '@/config';
 import { QuizFilters } from '@/components/dashboard/quiz/quiz-filters';
 import { QuizTable } from '@/components/dashboard/quiz/quiz-table';
 import type { Quiz } from '@/components/dashboard/quiz/quiz-table';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { QuizFormData, QuizFormDialog } from '@/components/dashboard/quiz/dialog';
+import axios from 'axios';
+import { API_URLS } from '@/api';
 
 const metadata = { title: `Question | Dashboard | ${config.site.name}` } satisfies Metadata;
 
@@ -24,30 +26,37 @@ export interface EditableQuiz extends Quiz {
   isEditing?: boolean;
 }
 
-const initialClasses: EditableQuiz[] = [
-  {
-    id: '626d5ad8f2a5f3e8c1a7c123',
-    title: "Science Quiz 1",
-    questions: ["What is the capital of France?", "What is the capital of Germany?"],
-    class_id: "626d5ad8f2a5f3e8c1a7c123",
-    is_active: true,
-    is_relesead: true,
-    start_time: dayjs().subtract(1, 'day').toDate(),
-    end_time: dayjs().add(1, 'day').toDate(),
-  },
-  // Add more initial data as needed
-];
+const initialClasses: EditableQuiz[] = [];
 
 export default function Page(): React.JSX.Element {
   const [quizzes, setQuizzes] = useState<EditableQuiz[]>(initialClasses);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<QuizFormData | undefined>(undefined);
 
-  
-  // Implement CRUD operations here
-  const addQuiz = (newClass: EditableQuiz) => {
-    setQuizzes([...quizzes, newClass]);
-  };
+  const fetchData = async () => {
+    try {
+      // add token to the header as Bearer token
+      const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await axios.get(API_URLS.getQuizzes, { headers });
+      console.log("Quiz Response", response.data);
+      setQuizzes(response.data);
+
+      console.log("Quizzes", quizzes);
+      console.log("quiz count", quizzes.length);
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+    }
+  }
+
+  useEffect(() => {
+
+    fetchData();
+
+  }, []);
+
 
   const updateQuiz = (updatedQuiz: EditableQuiz) => {
     setQuizzes(quizzes.map(q => q.id === updatedQuiz.id ? updatedQuiz : q));
@@ -65,25 +74,28 @@ export default function Page(): React.JSX.Element {
     setIsDialogOpen(false);
     setEditingQuiz(undefined); // Reset editing class
   };
-
-  function generateNewId() {
-    // This example generates a random UUID, but you should use a method that
-    // makes sense for your application and guarantees uniqueness as needed.
-    return 'xxxx-xxxx-4xxx-yxxx-xxxx-xxxx'.replace(/[xy]/g, function(c) {
-      var r = (Math.random() * 16) | 0, v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  }
   
-  const handleAddOrUpdateQuestion = (formData: QuizFormData) => {
+  const handleUpdateQuestion = async (formData: QuizFormData) => {
+    const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
     if (editingQuiz && editingQuiz.id) {
+      const body = {
+        title: formData.title,
+        start_time: formData.start_time,
+        end_time: formData.end_time,
+      }
+      console.log("body", body);
+      const response = await axios.put(`${API_URLS.updateQuiz}/${editingQuiz.id}`, body, { headers });
+      console.log("Backend successfully updated Response", response);
       updateQuiz({ ...formData, id: editingQuiz.id });
-    } else {
-      const newId = generateNewId(); // Generate a new ID for the new class
-      addQuiz({ ...formData, id: newId });
+    } 
+    else {
+      console.log("Updated Data not found");
     }
-    // ... rest of your logic
-  };
+    };
 
   const handleEdit = (quizToEdit: EditableQuiz) => {
     setEditingQuiz({
@@ -102,7 +114,7 @@ export default function Page(): React.JSX.Element {
   
 
   const page = 0;
-  const rowsPerPage = 5;
+  const rowsPerPage = 25;
 
   const paginatedQuizzes = applyPagination(quizzes, page, rowsPerPage);
 
@@ -120,17 +132,11 @@ export default function Page(): React.JSX.Element {
             </Button>
           </Stack>
         </Stack>
-        {/* <div>
-          <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={handleOpenDialog}>
-            Add
-          </Button>
-        </div> */}
       </Stack>
       <QuizFilters
       onAddQuestion={handleOpenDialog}
        />
       <QuizTable
-        addQuiz={addQuiz}
         updateQuiz={updateQuiz}
         deleteQuiz={deleteQuiz}
         count={paginatedQuizzes.length}
@@ -143,7 +149,7 @@ export default function Page(): React.JSX.Element {
         open={isDialogOpen}
         quizData={editingQuiz}
         onClose={handleCloseDialog}
-        onSubmit={handleAddOrUpdateQuestion}
+        onSubmit={handleUpdateQuestion}
       />
     </Stack>
   );

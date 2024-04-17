@@ -14,43 +14,69 @@ import { config } from '@/config';
 import { QuestionFilters } from '@/components/dashboard/question/question-filters';
 import { QuestionTable } from '@/components/dashboard/question/question-table';
 import type { Question } from '@/components/dashboard/question/question-table';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { QuestionFormData, QuestionFormDialog } from '@/components/dashboard/question/dialog';
+import axios from 'axios';
+import { API_URLS } from '@/api';
 
 const metadata = { title: `Question | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 export interface EditableQuestion extends Question {
-  id: string;
+  _id: string;
   isEditing?: boolean;
 }
 
-const initialClasses: EditableQuestion[] = [
-  {
-    id: '626d5ad8f2a5f3e8c1a7c123',
-    question: "What is data mining?",
-    answer: "this is my answerthis is my answerthis is my answerthis is my answerthis is my answerthis is mythis is my answerthis is my answerthis is my answerthis is my answerthis is my answerthis is m ",
-    label: "Mining",
-  },
-  // Add more initial data as needed
-];
+const initialClasses: EditableQuestion[] = [];
 
 export default function Page(): React.JSX.Element {
+  const [quizId, setQuizId] = useState("");
   const [questions, setQuestions] = useState<EditableQuestion[]>(initialClasses);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<QuestionFormData | undefined>(undefined);
 
+
+  const fetchData = async () => {
+    try {
+      // add token to the header as Bearer token
+      const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const storedQuizId = localStorage.getItem('currentQuizId');
+      if(storedQuizId){
+        setQuizId(storedQuizId);
+        // localStorage.removeItem('currentQuizId');
+        // console.log("id removed from local storage");
+      }
+      const response = await axios.get(`${API_URLS.getQuestionsByQuizId}/${storedQuizId}`, { headers });
+      console.log("Questions Response", response.data.questions);
+      setQuestions(response.data.questions);
+
+      console.log("Questions", questions);
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+    }
+  }
+
+  useEffect(() => {
+
+    fetchData();
+
+  }, []);
+
   
-  // Implement CRUD operations here
-  const addQuestion = (newClass: EditableQuestion) => {
-    setQuestions([...questions, newClass]);
-  };
+  // // Implement CRUD operations here
+  // const addQuestion = (newClass: EditableQuestion) => {
+  //   setQuestions([...questions, newClass]);
+  // };
 
   const updateQuestion = (updatedQuestion: EditableQuestion) => {
-    setQuestions(questions.map(q => q.id === updatedQuestion.id ? updatedQuestion : q));
+    setQuestions(questions.map(q => q._id === updatedQuestion._id ? updatedQuestion : q));
   };
 
   const deleteQuestion = (questionId: string) => {
-    setQuestions(questions.filter(q => q.id !== questionId));
+    setQuestions(questions.filter(q => q._id !== questionId));
   };
 
   const handleOpenDialog = () => {
@@ -62,31 +88,46 @@ export default function Page(): React.JSX.Element {
     setEditingQuestion(undefined); // Reset editing class
   };
 
-  function generateNewId() {
-    // This example generates a random UUID, but you should use a method that
-    // makes sense for your application and guarantees uniqueness as needed.
-    return 'xxxx-xxxx-4xxx-yxxx-xxxx-xxxx'.replace(/[xy]/g, function(c) {
-      var r = (Math.random() * 16) | 0, v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  }
   
-  const handleAddOrUpdateQuestion = (formData: QuestionFormData) => {
+  const handleAddOrUpdateQuestion = async (formData: QuestionFormData) => {
+    const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
     if (editingQuestion && editingQuestion.id) {
-      updateQuestion({ ...formData, id: editingQuestion.id });
-    } else {
-      const newId = generateNewId(); // Generate a new ID for the new class
-      addQuestion({ ...formData, id: newId });
+      const body = {
+        questionId: editingQuestion.id,
+        question: formData.question,
+        answer: formData.answer,
+      }
+      console.log("body", body);
+      const response = await axios.put(`${API_URLS.updateQuestion}/${editingQuestion.id}`, body, { headers });
+      console.log(response);
+      updateQuestion({ ...formData, _id: editingQuestion.id });
+    } else { 
+      console.log("formdata", formData);
+      console.log("Quiz Id", quizId);
+        const body = {
+          quizId: quizId,
+          question: formData.question,
+          answer: formData.answer,
+        }
+        const response = await axios.post(`${API_URLS.createQuestion}`, body, { headers });
+        console.log('add class response', response);
+        fetchData();
+        console.log("data fetched");
+        setEditingQuestion(undefined); 
     }
-    // ... rest of your logic
   };
 
   const handleEdit = (questionToEdit: EditableQuestion) => {
     setEditingQuestion({
-      id: questionToEdit.id,
+      id: questionToEdit._id,
       question: questionToEdit.question,
       answer: questionToEdit.answer,
       label: questionToEdit.label,
+      true_grade: questionToEdit.true_grade,
 
     });
     setIsDialogOpen(true); // Open the dialog for editing
@@ -123,8 +164,6 @@ export default function Page(): React.JSX.Element {
       onAddQuestion={handleOpenDialog}
        />
       <QuestionTable
-        addQuestion={addQuestion}
-        updateQuestion={updateQuestion}
         deleteQuestion={deleteQuestion}
         count={paginatedQuestions.length}
         page={page}

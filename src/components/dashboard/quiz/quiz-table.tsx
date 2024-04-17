@@ -20,6 +20,8 @@ import { EditableQuiz } from '@/app/dashboard/quiz/page';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Question } from '../question/question-table';
+import { useRouter } from 'next/navigation';
 
 
 function noop(): void {
@@ -43,7 +45,6 @@ interface QuizTableProps {
   page?: number;
   rows?: EditableQuiz[];
   rowsPerPage?: number;
-  addQuiz: (newClass: EditableQuiz) => void;
   updateQuiz: (updatedClass: EditableQuiz) => void;
   deleteQuiz: (classId: string) => void;
   onEditQuiz: (classData: EditableQuiz) => void;
@@ -54,11 +55,19 @@ export function QuizTable({
   rows = [],
   page = 0,
   rowsPerPage = 0,
-  addQuiz, updateQuiz, deleteQuiz, onEditQuiz,
+  deleteQuiz,
+  onEditQuiz,
 }: QuizTableProps): React.JSX.Element {
+  const router = useRouter();
   const rowIds = React.useMemo(() => {
     return rows.map((question) => question.id);
   }, [rows]);
+
+
+  const handleViewQuestions = (quizId: string) => {
+    localStorage.setItem('currentQuizId', quizId);
+    router.push(`/dashboard/question`);
+  };
 
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
 
@@ -89,6 +98,7 @@ export function QuizTable({
               <TableCell>End Time</TableCell>
               <TableCell>Active Status</TableCell>
               <TableCell>Released Status</TableCell>
+              <TableCell>Questions</TableCell>
               <TableCell><p> Actions </p></TableCell>
 
             </TableRow>
@@ -97,45 +107,56 @@ export function QuizTable({
             {rows.map((row) => {
               const isSelected = selected?.has(row.id);
 
-                return (
+              return (
                 <TableRow hover key={row.id} selected={isSelected}>
                   <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={isSelected}
-                    onChange={(event) => {
-                    if (event.target.checked) {
-                      selectOne(row.id);
-                    } else {
-                      deselectOne(row.id);
-                    }
-                    }}
-                  />
+                    <Checkbox
+                      checked={isSelected}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          selectOne(row.id);
+                        } else {
+                          deselectOne(row.id);
+                        }
+                      }}
+                    />
                   </TableCell>
                   <TableCell>
-                  {row.title.toString()}
+                    {row.title.toString()}
                   </TableCell>
                   <TableCell>
-                  {row.start_time.toString()}
+                    {row.start_time.toString()}
                   </TableCell>
                   <TableCell>
-                  {row.end_time.toString()}
+                    {row.end_time.toString()}
                   </TableCell>
                   <TableCell>
-                  {row.is_active.toString()}
+                    {row.is_active.toString()}
                   </TableCell>
                   <TableCell>
-                  {row.is_relesead.toString()}
+                    {row.is_relesead.toString()}
                   </TableCell>
                   <TableCell>
-                  <IconButton onClick={() => onEditQuiz(row)} aria-label="edit" style={{ marginRight: '10px'}}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => deleteQuiz(row.id)} aria-label="delete">
-                    <DeleteIcon />
-                  </IconButton>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleViewQuestions(row.id)}
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick= {() => onEditQuiz(row)}
+                      aria-label="edit" style={{ marginRight: '10px' }}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => deleteQuiz(row.id)} aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
-                );
+              );
             })}
           </TableBody>
         </Table>
