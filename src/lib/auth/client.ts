@@ -69,6 +69,8 @@ class AuthClient {
     }
 
     localStorage.setItem('custom-auth-token', response.data.token);
+    localStorage.setItem('user-email', email);
+    localStorage.setItem('user-name', response.data.name);
 
     console.log(response.data);
 

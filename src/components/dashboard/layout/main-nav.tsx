@@ -22,6 +22,23 @@ export function MainNav(): React.JSX.Element {
 
   const userPopover = usePopover<HTMLDivElement>();
 
+  const fetchData = async () => {
+    try {
+      // add token to the header as Bearer token
+      const userName = localStorage.getItem('user-name');
+      const userEmail = localStorage.getItem('user-email');
+      console.log(userName);
+      console.log(userEmail);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  }
+
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
+
   return (
     <React.Fragment>
       <Box
@@ -76,7 +93,7 @@ export function MainNav(): React.JSX.Element {
           </Stack>
         </Stack>
       </Box>
-      <UserPopover anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />
+      <UserPopover anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} email={localStorage.getItem('user-email') || ''} name={localStorage.getItem('user-name') || ''} />
       <MobileNav
         onClose={() => {
           setOpenNav(false);
