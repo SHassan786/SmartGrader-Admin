@@ -11,6 +11,8 @@ import { Bell as BellIcon } from '@phosphor-icons/react/dist/ssr/Bell';
 import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
+import axios from 'axios';
+import { API_URLS } from '@/api';
 
 import { usePopover } from '@/hooks/use-popover';
 
@@ -19,6 +21,7 @@ import { UserPopover } from './user-popover';
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
+  const [pfppath, setPfppath] = React.useState<string>('');
 
   const userPopover = usePopover<HTMLDivElement>();
 
@@ -27,8 +30,19 @@ export function MainNav(): React.JSX.Element {
       // add token to the header as Bearer token
       const userName = localStorage.getItem('user-name');
       const userEmail = localStorage.getItem('user-email');
-      console.log(userName);
-      console.log(userEmail);
+      const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const profileResponse = await axios.get(API_URLS.getProfile, { headers });
+      let pfppath = profileResponse.data.teacher.profile_picture.path;
+
+      pfppath = API_URLS.baseUrl + "/" + pfppath.replace(/\\/g, "/")
+      // use this path to get the profile picture and set it to the avatar
+      console.log("Profile Picture Path", pfppath);
+      setPfppath(pfppath);
+
+
     } catch (error) {
       console.error('Error fetching user:', error);
     }
@@ -84,12 +98,14 @@ export function MainNav(): React.JSX.Element {
                 </IconButton>
               </Badge>
             </Tooltip>
-            <Avatar
-              onClick={userPopover.handleOpen}
-              ref={userPopover.anchorRef}
-              src="/assets/avatar.png"
-              sx={{ cursor: 'pointer' }}
-            />
+            {pfppath &&
+              (<Avatar
+                onClick={userPopover.handleOpen}
+                ref={userPopover.anchorRef}
+                src={`${pfppath}`}
+                sx={{ cursor: 'pointer' }}
+              />)
+            }
           </Stack>
         </Stack>
       </Box>
