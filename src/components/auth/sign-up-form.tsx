@@ -23,8 +23,8 @@ import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
 const schema = zod.object({
-  firstName: zod.string().min(1, { message: 'First name is required' }),
-  lastName: zod.string().min(1, { message: 'Last name is required' }),
+  name: zod.string().min(1, { message: 'Name is required' }),
+  // lastName: zod.string().min(1, { message: 'Last name is required' }),
   email: zod.string().min(1, { message: 'Email is required' }).email(),
   password: zod.string().min(6, { message: 'Password should be at least 6 characters' }),
   terms: zod.boolean().refine((value) => value, 'You must accept the terms and conditions'),
@@ -32,7 +32,7 @@ const schema = zod.object({
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { firstName: '', lastName: '', email: '', password: '', terms: false } satisfies Values;
+const defaultValues = { name: '', email: '', password: '', terms: false } satisfies Values;
 
 export function SignUpForm(): React.JSX.Element {
   const router = useRouter();
@@ -60,6 +60,16 @@ export function SignUpForm(): React.JSX.Element {
         return;
       }
 
+      // sign in the user
+      const { email, password } = values;
+      const { error: signInError } = await authClient.signInWithPassword({ email, password });
+
+      if (signInError) {
+        setError('root', { type: 'server', message: signInError });
+        setIsPending(false);
+        return;
+      }
+
       // Refresh the auth state
       await checkSession?.();
 
@@ -83,7 +93,7 @@ export function SignUpForm(): React.JSX.Element {
       </Stack>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
-          <Controller
+          {/* <Controller
             control={control}
             name="firstName"
             render={({ field }) => (
@@ -93,15 +103,15 @@ export function SignUpForm(): React.JSX.Element {
                 {errors.firstName ? <FormHelperText>{errors.firstName.message}</FormHelperText> : null}
               </FormControl>
             )}
-          />
+          /> */}
           <Controller
             control={control}
-            name="lastName"
+            name="name"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.firstName)}>
-                <InputLabel>Last name</InputLabel>
+              <FormControl error={Boolean(errors.name)}>
+                <InputLabel>Name</InputLabel>
                 <OutlinedInput {...field} label="Last name" />
-                {errors.firstName ? <FormHelperText>{errors.firstName.message}</FormHelperText> : null}
+                {errors.name ? <FormHelperText>{errors.name.message}</FormHelperText> : null}
               </FormControl>
             )}
           />
@@ -150,7 +160,7 @@ export function SignUpForm(): React.JSX.Element {
           </Button>
         </Stack>
       </form>
-      <Alert color="warning">Created users are not persisted</Alert>
+      {/* <Alert color="warning">Created users are not persisted</Alert> */}
     </Stack>
   );
 }

@@ -19,8 +19,8 @@ const user = {
 } satisfies User;
 
 export interface SignUpParams {
-  firstName: string;
-  lastName: string;
+  name: string;
+  // lastName: string;
   email: string;
   password: string;
 }
@@ -39,8 +39,19 @@ export interface ResetPasswordParams {
 }
 
 class AuthClient {
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
+  async signUp(params: SignUpParams): Promise<{ error?: string }> {
+    const { name, email, password } = params;
+    console.log(name, email, password);
+
     // Make API request
+    const response = await axios.post(API_URLS.signUp, { name, email, password });
+
+    console.log(response.data);
+
+    if (response.status !== 201) {
+      return { error: 'Invalid credentials' };
+    }
+
 
     // We do not handle the API, so we'll just generate a token and store it in localStorage.
     const token = generateToken();

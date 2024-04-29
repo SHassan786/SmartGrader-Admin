@@ -2,9 +2,10 @@ const host = 'http://localhost:5000';
 
 export const API_URLS = {
     baseUrl: host,
-    signUp: `${host}/signUp`,
+    signUp: `${host}/teacher/signUp/picture`,
     signIn: `${host}/signIn`,
     updateProfile: `${host}/teacher/profile/picture`,
+    updateProfileDetails: `${host}/teacher/profile`,
     getProfile: `${host}/teacher/profile`,
     classes: `${host}/class`,
     addClass: `${host}/class`,

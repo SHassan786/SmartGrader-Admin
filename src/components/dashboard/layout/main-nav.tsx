@@ -35,9 +35,13 @@ export function MainNav(): React.JSX.Element {
         Authorization: `Bearer ${token}`,
       };
       const profileResponse = await axios.get(API_URLS.getProfile, { headers });
-      let pfppath = profileResponse.data.teacher.profile_picture.path;
+      if (profileResponse.status !== 200) {
+        console.error('Error fetching user:', profileResponse);
+        return;
+      }
+      let pfppath = profileResponse.data.teacher?.profile_picture?.path;
 
-      pfppath = API_URLS.baseUrl + "/" + pfppath.replace(/\\/g, "/")
+      pfppath = pfppath ? API_URLS.baseUrl + "/" + pfppath.replace(/\\/g, "/") : '';
       // use this path to get the profile picture and set it to the avatar
       console.log("Profile Picture Path", pfppath);
       setPfppath(pfppath);
@@ -98,11 +102,13 @@ export function MainNav(): React.JSX.Element {
                 </IconButton>
               </Badge>
             </Tooltip>
-            {pfppath &&
+            {
               (<Avatar
                 onClick={userPopover.handleOpen}
                 ref={userPopover.anchorRef}
+                // if the profile picture is not available, use the default avatar
                 src={`${pfppath}`}
+
                 sx={{ cursor: 'pointer' }}
               />)
             }
