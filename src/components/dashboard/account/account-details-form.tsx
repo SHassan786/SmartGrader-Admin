@@ -45,7 +45,11 @@ const updateProfile = async ({ name, password }: Profile): Promise<void> => {
     };
     const body = { name, password };
     console.log(body);
-    const response = await axios.put(API_URLS.updateProfile, body, { headers });
+    const response = await axios.put(API_URLS.updateProfileDetails, body, { headers });
+    if (response.status !== 200) {
+      console.error('Error updating user:', response);
+      return;
+    }
     console.log(response.data);
 
     // update the local storage
