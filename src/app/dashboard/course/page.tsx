@@ -72,8 +72,8 @@ export default function Page(): React.JSX.Element {
       const response = await axios.delete(`${API_URLS.deleteClass}/${classId}`, { headers });
       console.log("Response", response);
       setClasses(classes.filter(c => c._id !== classId));
-    } catch {
-
+    } catch (error){
+      throw error
     }
   };
 

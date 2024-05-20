@@ -30,7 +30,7 @@ export interface Question {
   _id: string;
   question: String;
   answer: String;
-  true_grade: Number;
+  true_grade: Number ;
   label: String;
 }
 
@@ -80,7 +80,7 @@ export function QuestionTable({
               </TableCell>
               <TableCell>Question</TableCell>
               <TableCell>Answer</TableCell>
-              <TableCell>Label</TableCell>
+              <TableCell>True Grade</TableCell>
               <TableCell><p> Actions </p></TableCell>
 
             </TableRow>
@@ -89,39 +89,42 @@ export function QuestionTable({
             {rows.map((row) => {
               const isSelected = selected?.has(row._id);
 
-                return (
+              return (
                 <TableRow hover key={row._id} selected={isSelected}>
                   <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={isSelected}
-                    onChange={(event) => {
-                    if (event.target.checked) {
-                      selectOne(row._id);
-                    } else {
-                      deselectOne(row._id);
-                    }
-                    }}
-                  />
+                    <Checkbox
+                      checked={isSelected}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          selectOne(row._id);
+                        } else {
+                          deselectOne(row._id);
+                        }
+                      }}
+                    />
                   </TableCell>
                   <TableCell>
-                  {row.question.toString()}
+                    {row.question.toString()}
                   </TableCell>
                   <TableCell>
-                  {row.answer.toString()}
+                    {row.answer.toString()}
                   </TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                   {row.label.toString()}
+                  </TableCell> */}
+                  <TableCell>
+                    {String(row.true_grade)}
                   </TableCell>
                   <TableCell>
-                  <IconButton onClick={() => onEditQuestion(row)} aria-label="edit" style={{ marginRight: '10px'}}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => deleteQuestion(row._id)} aria-label="delete">
-                    <DeleteIcon />
-                  </IconButton>
+                    <IconButton onClick={() => onEditQuestion(row)} aria-label="edit" style={{ marginRight: '10px' }}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => deleteQuestion(row._id)} aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
-                );
+              );
             })}
           </TableBody>
         </Table>

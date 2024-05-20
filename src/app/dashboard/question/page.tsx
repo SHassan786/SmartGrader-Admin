@@ -75,8 +75,18 @@ export default function Page(): React.JSX.Element {
     setQuestions(questions.map(q => q._id === updatedQuestion._id ? updatedQuestion : q));
   };
 
-  const deleteQuestion = (questionId: string) => {
-    setQuestions(questions.filter(q => q._id !== questionId));
+  const deleteQuestion = async (questionId: string) => {
+    try{
+      const token = localStorage.getItem('custom-auth-token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await axios.delete(`${API_URLS.deleteQuestion}/${questionId}`, { headers });
+      console.log("Question delete Response", response);
+      setQuestions(questions.filter(q => q._id !== questionId));
+    } catch (error){
+      throw error
+    }
   };
 
   const handleOpenDialog = () => {
